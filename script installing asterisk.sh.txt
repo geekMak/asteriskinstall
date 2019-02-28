@@ -1,0 +1,46 @@
+#!/bin/bash
+echo('Installing Asterisk')
+echo(uname -a)
+cd /usr/src/ #going to src folder
+wget http://downloads.asterisk.org/pub/telephony/certified-asterisk/asterisk-certified-13.21-current.tar.gz #installing asterisk
+tar zxfv asterisk-certified-13.21-current.tar.gz #unzipping
+rm -Rf asterisk-certified-13.21-current.tar.gz
+cd asterisk-certified-13.21-cert3/
+./configure
+yum -y install gcc gcc-c++ #missing packages
+./configure
+yum -y install gcc gcc-c++ libxml2-devel sqlite-devel ncurses-devel
+yum -y install libuuid-devel
+
+wget http://www.digip.org/jansson/releases/jansson-2.5.tar.gz
+
+tar -zxf jansson-2.5.tar.gz
+
+cd jansson*
+
+./configure --prefix=/usr/ && make clean && make && make install && ldconfig
+cd 
+#make menuselect
+make #to compile
+make install  
+make samples
+
+
+#setting up asterisk as a service
+yum -y install nano
+cp contrib/init.d/rc.redhat.asterisk /etc/init.d/asterisk
+rm /etc/init.d/asterisk
+cp contrib/init.d/rc.redhat.asterisk /etc/init.d/asterisk
+echo ('change installation direcetory to /usr/sbin/')
+sleep 20
+nano /etc/init.d/asterisk
+service asterisk start
+#in cas if itis running execute this comand ln -s /usr/lib/libasteriskssl.so.1 /usr/lib64/libasteriskssl.so.1
+
+echo ('change selinux to disabled')
+sleep 10
+nano /etc/selinux/config
+
+
+#system boot with asterisk
+chkconfig asterisk on
